@@ -95,8 +95,11 @@ class _HomeScreenState extends State<HomeScreen> {
               child: filteredTasks.isEmpty
                   ? Center(
                       child: Text(
+                        // Show the correct message depending on the situation.
                         controller.tasks.isEmpty
                             ? 'No tasks yet!\nTap + to add your first task.'
+                            : controller.searchQuery.value.isNotEmpty
+                            ? 'No tasks found for "${controller.searchQuery.value}".'
                             : 'No ${controller.selectedFilter.value.toLowerCase()} tasks found.',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 18),
