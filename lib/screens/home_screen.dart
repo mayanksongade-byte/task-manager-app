@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/task_controller.dart';
 import '../controllers/theme_controller.dart';
 import 'add_edit_task_screen.dart';
+import '../widgets/task_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -117,7 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? Theme.of(context).colorScheme.onPrimary
                               : Theme.of(context).colorScheme.onSurface,
                         ),
-                        child: Text(filter),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            filter,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
+                        ),
                       ),
                     ),
                   );
@@ -146,85 +154,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         final task = filteredTasks[index];
 
-                        return ListTile(
-                          // Display task title.
-                          title: Text(task.title),
+                        return TaskCard(
+                          // Send the current task to the card.
+                          task: task,
 
-                          // Display task description and due date.
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(task.description),
+                          // Change Pending to Completed or vice versa.
+                          onToggle: () {
+                            controller.toggleTaskStatus(task);
+                          },
 
-                              const SizedBox(height: 4),
+                          // Open the Edit Task screen.
+                          onEdit: () {
+                            Get.to(() => AddEditTaskScreen(task: task));
+                          },
 
-                              // Display the task's due date.
-                              Text(
-                                'Due: ${task.dueDate}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
+                          // Show confirmation before deleting.
+                          onDelete: () {
+                            Get.defaultDialog(
+                              title: 'Delete Task?',
+                              middleText:
+                                  'Are you sure you want to delete this task?',
+                              textCancel: 'Cancel',
+                              textConfirm: 'Delete',
+                              confirmTextColor: Colors.white,
+                              buttonColor: Colors.red,
+                              onConfirm: () async {
+                                await controller.deleteTask(task.id!);
+                                Get.back();
 
-                          // Change Pending / Completed status.
-                          leading: IconButton(
-                            icon: Icon(
-                              task.isCompleted
-                                  ? Icons.check_circle
-                                  : Icons.radio_button_unchecked,
-                              color: task.isCompleted
-                                  ? Colors.green
-                                  : Colors.grey,
-                            ),
-                            onPressed: () {
-                              controller.toggleTaskStatus(task);
-                            },
-                          ),
-
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Edit task.
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  Get.to(() => AddEditTaskScreen(task: task));
-                                },
-                              ),
-
-                              // Delete task.
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () {
-                                  Get.defaultDialog(
-                                    title: 'Delete Task?',
-                                    middleText: 'Are you sure you want to delete this task?',
-                                    textCancel: 'Cancel',
-                                    textConfirm: 'Delete',
-                                    confirmTextColor: Colors.white,
-                                    buttonColor: Colors.red,
-                                    onConfirm: () async {
-                                      await controller.deleteTask(task.id!);
-                                      Get.back();
-
-                                      Get.snackbar(
-                                        'Success',
-                                        'Task deleted successfully',
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
+                                Get.snackbar(
+                                  'Success',
+                                  'Task deleted successfully',
+                                );
+                              },
+                            );
+                          },
                         );
                       },
                     ),
