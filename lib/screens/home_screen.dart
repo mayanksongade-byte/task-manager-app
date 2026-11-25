@@ -56,6 +56,22 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(task.title),
               subtitle: Text(task.description),
 
+              // Button to change task status.
+              leading: IconButton(
+                icon: Icon(
+                  task.isCompleted
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: task.isCompleted ? Colors.green : Colors.grey,
+                ),
+
+                onPressed: () {
+                  controller.toggleTaskStatus(task);
+                },
+              ),
+
+
+
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

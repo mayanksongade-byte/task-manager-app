@@ -1,11 +1,9 @@
-
 import 'package:get/get.dart';
 
 import '../database/database_helper.dart';
 import '../models/task_model.dart';
 
 class TaskController extends GetxController {
-
   // Connect the controller to our database.
   final DatabaseHelper databaseHelper = DatabaseHelper.instance;
 
@@ -25,6 +23,7 @@ class TaskController extends GetxController {
     // Refresh the task list after saving.
     await loadTasks();
   }
+
   // Updates an existing task in SQLite.
   Future<void> updateTask(TaskModel task) async {
     await databaseHelper.updateTask(task);
@@ -39,5 +38,20 @@ class TaskController extends GetxController {
 
     // Refresh the task list after deleting.
     await loadTasks();
+  }
+
+  // Changes a task between Completed and Pending.
+  Future<void> toggleTaskStatus(TaskModel task) async {
+    // Create a copy of the task with the opposite status.
+    final updatedTask = TaskModel(
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      dueDate: task.dueDate,
+      isCompleted: !task.isCompleted,
+    );
+
+    // Save the changed task in SQLite.
+    await updateTask(updatedTask);
   }
 }
