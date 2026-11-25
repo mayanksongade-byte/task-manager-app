@@ -112,8 +112,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           // Display task title.
                           title: Text(task.title),
 
-                          // Display task description.
-                          subtitle: Text(task.description),
+                          // Display task description and due date.
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(task.description),
+
+                              const SizedBox(height: 4),
+
+                              // Display the task's due date.
+                              Text(
+                                'Due: ${task.dueDate}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
 
                           // Change Pending / Completed status.
                           leading: IconButton(
