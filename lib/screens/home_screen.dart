@@ -55,10 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
             return ListTile(
               title: Text(task.title),
               subtitle: Text(task.description),
+
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Shows whether the task is completed or pending.
+                  // Shows the task completion status.
                   Icon(
                     task.isCompleted
                         ? Icons.check_circle
@@ -70,6 +71,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: const Icon(Icons.edit),
                     onPressed: () {
                       Get.to(() => AddEditTaskScreen(task: task));
+                    },
+                  ),
+
+                  // Opens the Delete confirmation dialog.
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      Get.defaultDialog(
+                        title: 'Delete Task?',
+                        middleText:
+                            'Are you sure you want to delete this task?',
+                        textCancel: 'Cancel',
+                        textConfirm: 'Delete',
+                        confirmTextColor: Colors.white,
+                        buttonColor: Colors.red,
+                        onConfirm: () async {
+                          await controller.deleteTask(task.id!);
+                          Get.back();
+
+                          Get.snackbar('Success', 'Task deleted successfully');
+                        },
+                      );
                     },
                   ),
                 ],

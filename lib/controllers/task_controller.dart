@@ -32,4 +32,12 @@ class TaskController extends GetxController {
     // Refresh the task list after updating.
     await loadTasks();
   }
+
+  // Deletes a task from SQLite.
+  Future<void> deleteTask(int id) async {
+    await databaseHelper.deleteTask(id);
+
+    // Refresh the task list after deleting.
+    await loadTasks();
+  }
 }
