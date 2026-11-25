@@ -25,4 +25,11 @@ class TaskController extends GetxController {
     // Refresh the task list after saving.
     await loadTasks();
   }
+  // Updates an existing task in SQLite.
+  Future<void> updateTask(TaskModel task) async {
+    await databaseHelper.updateTask(task);
+
+    // Refresh the task list after updating.
+    await loadTasks();
+  }
 }

@@ -55,8 +55,24 @@ class _HomeScreenState extends State<HomeScreen> {
             return ListTile(
               title: Text(task.title),
               subtitle: Text(task.description),
-              trailing: Icon(
-                task.isCompleted ? Icons.check_circle : Icons.pending_actions,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Shows whether the task is completed or pending.
+                  Icon(
+                    task.isCompleted
+                        ? Icons.check_circle
+                        : Icons.pending_actions,
+                  ),
+
+                  // Opens the Edit Task screen.
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      Get.to(() => AddEditTaskScreen(task: task));
+                    },
+                  ),
+                ],
               ),
             );
           },

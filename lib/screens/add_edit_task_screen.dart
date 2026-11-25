@@ -61,48 +61,53 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     }
   }
 
-  // Saves the new task.
+  // Saves and update  the new task.
+
 
   Future<void> saveTask() async {
-    debugPrint('1. SAVE BUTTON PRESSED');
-
-    // Check whether all fields are filled.
+    // Check whether the user entered all required information.
     if (titleController.text.trim().isEmpty ||
         descriptionController.text.trim().isEmpty ||
         selectedDate == null) {
-      debugPrint('2. VALIDATION FAILED');
-
       Get.snackbar('Error', 'Please fill in all fields');
       return;
     }
 
-    debugPrint('2. VALIDATION PASSED');
-
     try {
-      // Create a task object.
+      // Create a task object using the form information.
       final task = TaskModel(
+        // Keep the old ID when editing an existing task.
+        id: widget.task?.id,
+
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         dueDate: selectedDate!.toIso8601String().split('T')[0],
+
+        // Keep the existing completion status when editing.
+        isCompleted: widget.task?.isCompleted ?? false,
       );
 
-      debugPrint('3. TASK OBJECT CREATED');
+      if (widget.task == null) {
+        // No existing task means we are creating a new task.
+        await taskController.addTask(task);
+      } else {
+        // Existing task means we are updating it.
+        await taskController.updateTask(task);
+      }
 
-      // Save task using the controller.
-      await taskController.addTask(task);
-
-      debugPrint('4. TASK SAVED SUCCESSFULLY');
-
-      // Return to Home Screen.
       Get.back();
 
-      Get.snackbar('Success', 'Task added successfully');
+      Get.snackbar(
+        'Success',
+        widget.task == null
+            ? 'Task added successfully'
+            : 'Task updated successfully',
+      );
     } catch (e) {
-      debugPrint('5. DATABASE ERROR: $e');
-
       Get.snackbar('Error', 'Unable to save task: $e');
     }
   }
+
 
 
   @override
