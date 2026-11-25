@@ -1,22 +1,39 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// This controller manages the app's Light and Dark themes.
+// Manages the app's Light and Dark themes.
 class ThemeController extends GetxController {
-
-  // This variable stores the current theme.
-  // false means Light Mode; true means Dark Mode.
+  // Stores the current theme.
   var isDarkMode = false.obs;
 
-  // This method changes the current theme.
-  void toggleTheme() {
-    // Change Light to Dark or Dark to Light.
+  // Loads the previously saved theme when the app starts.
+  @override
+  void onInit() {
+    super.onInit();
+    loadTheme();
+  }
+
+  // Reads the saved theme from device storage.
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // If no preference exists, use Light Mode.
+    isDarkMode.value = prefs.getBool('isDarkMode') ?? false;
+
+    // Apply the saved theme.
+    Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+  }
+
+  // Changes the theme and saves the choice.
+  Future<void> toggleTheme() async {
     isDarkMode.value = !isDarkMode.value;
 
-    // Tell GetMaterialApp to apply the selected theme.
-    Get.changeThemeMode(
-      isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
-    );
+    // Save the selected theme on the device.
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', isDarkMode.value);
+
+    // Apply the selected theme.
+    Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
   }
 }
