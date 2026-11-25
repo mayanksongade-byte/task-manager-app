@@ -147,6 +147,16 @@ Check code quality using:
 flutter analyze
 ```
 
+## 📥 Download APK
+
+Download the Android application here:
+
+[⬇️ **Download Task Manager APK**](https://github.com/mayanksongade-byte/task-manager-app/releases/latest/download/app-release.apk)
+
+- **Version:** 1.0.0
+- **Platform:** Android
+- **File size:** 48.8 MB
+
 ## AI Tools Used
 
 - ChatGPT – Used for learning, understanding Flutter concepts, debugging assistance, and development guidance.
