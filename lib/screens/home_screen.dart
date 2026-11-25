@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/task_controller.dart';
+import '../controllers/theme_controller.dart';
 import 'add_edit_task_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,6 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
   // Connect this screen to our TaskController.
   final TaskController controller = Get.find<TaskController>();
 
+  // Connect this screen to our ThemeController.
+  final ThemeController themeController = Get.find<ThemeController>();
+
   @override
   void initState() {
     super.initState();
@@ -26,7 +30,34 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Task Manager'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Task Manager'),
+        centerTitle: true,
+
+        // Place the theme toggle button on the right side.
+        actions: [
+          Obx(() {
+            return IconButton(
+              // Show the correct icon for the current theme.
+              icon: Icon(
+                themeController.isDarkMode.value
+                    ? Icons.light_mode
+                    : Icons.dark_mode,
+              ),
+
+              // Switch between Light Mode and Dark Mode.
+              onPressed: () {
+                themeController.toggleTheme();
+              },
+
+              // Explain what the button does.
+              tooltip: themeController.isDarkMode.value
+                  ? 'Switch to Light Mode'
+                  : 'Switch to Dark Mode',
+            );
+          }),
+        ],
+      ),
 
       // Button to add a new task.
       floatingActionButton: FloatingActionButton(
@@ -62,9 +93,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // Display All, Pending and Completed buttons.
             Padding(
               padding: const EdgeInsets.all(12),
-
               child: Row(
                 children: ['All', 'Pending', 'Completed'].map((filter) {
+                  // Check whether this filter is currently selected.
+                  final isSelected = controller.selectedFilter.value == filter;
+
                   return Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -72,15 +105,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () {
                           controller.selectedFilter.value = filter;
                         },
+
+                        // Use colors that automatically support both themes.
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              controller.selectedFilter.value == filter
-                              ? Colors.deepPurple
-                              : Colors.grey.shade300,
-                          foregroundColor:
-                              controller.selectedFilter.value == filter
-                              ? Colors.white
-                              : Colors.black,
+                          backgroundColor: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest,
+                          foregroundColor: isSelected
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(context).colorScheme.onSurface,
                         ),
                         child: Text(filter),
                       ),
@@ -126,9 +161,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               // Display the task's due date.
                               Text(
                                 'Due: ${task.dueDate}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                                 ),
                               ),
                             ],
