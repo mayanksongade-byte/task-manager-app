@@ -54,4 +54,27 @@ class TaskController extends GetxController {
     // Save the changed task in SQLite.
     await updateTask(updatedTask);
   }
+
+  // Stores the currently selected filter.
+  var selectedFilter = 'All'.obs;
+
+  // Returns tasks according to the selected filter.
+  List<TaskModel> get filteredTasks {
+    // Show every task.
+    if (selectedFilter.value == 'All') {
+      return tasks;
+    }
+
+    // Show only pending tasks.
+    if (selectedFilter.value == 'Pending') {
+      return tasks.where((task) => !task.isCompleted).toList();
+    }
+
+    // Show only completed tasks.
+    if (selectedFilter.value == 'Completed') {
+      return tasks.where((task) => task.isCompleted).toList();
+    }
+
+    return tasks;
+  }
 }

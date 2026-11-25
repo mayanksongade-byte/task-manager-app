@@ -27,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Task Manager'), centerTitle: true),
+
+      // Button to add a new task.
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Get.to(() => const AddEditTaskScreen());
@@ -35,86 +37,125 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       body: Obx(() {
-        // Check whether there are any tasks.
-        if (controller.tasks.isEmpty) {
-          return const Center(
-            child: Text(
-              'No tasks yet!\nTap + to add your first task.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
-            ),
-          );
-        }
+        // Get tasks according to the selected filter.
+        final filteredTasks = controller.filteredTasks;
 
-        // Display all saved tasks.
-        return ListView.builder(
-          itemCount: controller.tasks.length,
-          itemBuilder: (context, index) {
-            final task = controller.tasks[index];
-
-            return ListTile(
-              title: Text(task.title),
-              subtitle: Text(task.description),
-
-              // Button to change task status.
-              leading: IconButton(
-                icon: Icon(
-                  task.isCompleted
-                      ? Icons.check_circle
-                      : Icons.radio_button_unchecked,
-                  color: task.isCompleted ? Colors.green : Colors.grey,
-                ),
-
-                onPressed: () {
-                  controller.toggleTaskStatus(task);
-                },
-              ),
-
-
-
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Shows the task completion status.
-                  Icon(
-                    task.isCompleted
-                        ? Icons.check_circle
-                        : Icons.pending_actions,
-                  ),
-
-                  // Opens the Edit Task screen.
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      Get.to(() => AddEditTaskScreen(task: task));
-                    },
-                  ),
-
-                  // Opens the Delete confirmation dialog.
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      Get.defaultDialog(
-                        title: 'Delete Task?',
-                        middleText:
-                            'Are you sure you want to delete this task?',
-                        textCancel: 'Cancel',
-                        textConfirm: 'Delete',
-                        confirmTextColor: Colors.white,
-                        buttonColor: Colors.red,
-                        onConfirm: () async {
-                          await controller.deleteTask(task.id!);
-                          Get.back();
-
-                          Get.snackbar('Success', 'Task deleted successfully');
+        return Column(
+          children: [
+            // Display All, Pending and Completed buttons.
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: ['All', 'Pending', 'Completed'].map((filter) {
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          controller.selectedFilter.value = filter;
                         },
-                      );
-                    },
-                  ),
-                ],
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              controller.selectedFilter.value == filter
+                              ? Colors.deepPurple
+                              : Colors.grey.shade300,
+                          foregroundColor:
+                              controller.selectedFilter.value == filter
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                        child: Text(filter),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
-            );
-          },
+            ),
+
+            // Show a message if no tasks match the selected filter.
+            Expanded(
+              child: filteredTasks.isEmpty
+                  ? Center(
+                      child: Text(
+                        controller.tasks.isEmpty
+                            ? 'No tasks yet!\nTap + to add your first task.'
+                            : 'No ${controller.selectedFilter.value.toLowerCase()} tasks found.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    )
+                  // Display the filtered task list.
+                  : ListView.builder(
+                      itemCount: filteredTasks.length,
+                      itemBuilder: (context, index) {
+                        final task = filteredTasks[index];
+
+                        return ListTile(
+                          // Display task title.
+                          title: Text(task.title),
+
+                          // Display task description.
+                          subtitle: Text(task.description),
+
+                          // Change Pending / Completed status.
+                          leading: IconButton(
+                            icon: Icon(
+                              task.isCompleted
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: task.isCompleted
+                                  ? Colors.green
+                                  : Colors.grey,
+                            ),
+                            onPressed: () {
+                              controller.toggleTaskStatus(task);
+                            },
+                          ),
+
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Edit task.
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  Get.to(() => AddEditTaskScreen(task: task));
+                                },
+                              ),
+
+                              // Delete task.
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  Get.defaultDialog(
+                                    title: 'Delete Task?',
+                                    middleText: 'Are you sure you want to delete this task?',
+                                    textCancel: 'Cancel',
+                                    textConfirm: 'Delete',
+                                    confirmTextColor: Colors.white,
+                                    buttonColor: Colors.red,
+                                    onConfirm: () async {
+                                      await controller.deleteTask(task.id!);
+                                      Get.back();
+
+                                      Get.snackbar(
+                                        'Success',
+                                        'Task deleted successfully',
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
         );
       }),
     );
