@@ -9,16 +9,11 @@ class AddEditTaskScreen extends StatefulWidget {
   // null means we are creating a new task.
   final TaskModel? task;
 
-  const AddEditTaskScreen({
-    super.key,
-    this.task,
-  });
+  const AddEditTaskScreen({super.key, this.task});
 
   @override
   State<AddEditTaskScreen> createState() => _AddEditTaskScreenState();
 }
-
-
 
 class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   // Checks whether this screen is editing an existing task.
@@ -49,8 +44,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   Future<void> pickDate() async {
     final date = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
       lastDate: DateTime(2035),
     );
 
@@ -62,7 +57,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   // Saves and update  the new task.
-
 
   Future<void> saveTask() async {
     // Check whether the user entered all required information.
@@ -108,8 +102,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     }
   }
 
-
-
   @override
   void dispose() {
     // Clean up the text controllers when leaving this screen.
@@ -121,7 +113,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Task')),
+      appBar: AppBar(title: Text(isEditing ? 'Edit Task' : 'Add Task')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
