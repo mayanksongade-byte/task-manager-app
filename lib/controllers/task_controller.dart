@@ -58,23 +58,36 @@ class TaskController extends GetxController {
   // Stores the currently selected filter.
   var selectedFilter = 'All'.obs;
 
-  // Returns tasks according to the selected filter.
+  // Stores the text entered in the search box.
+  var searchQuery = ''.obs;
+
+  // Returns tasks based on the selected filter and search text.
   List<TaskModel> get filteredTasks {
-    // Show every task.
-    if (selectedFilter.value == 'All') {
-      return tasks;
-    }
 
-    // Show only pending tasks.
+    // Start with all tasks.
+    List<TaskModel> result = tasks;
+
+    // If Pending is selected, keep only pending tasks.
     if (selectedFilter.value == 'Pending') {
-      return tasks.where((task) => !task.isCompleted).toList();
+      result = result.where((task) => !task.isCompleted).toList();
     }
 
-    // Show only completed tasks.
-    if (selectedFilter.value == 'Completed') {
-      return tasks.where((task) => task.isCompleted).toList();
+    // If Completed is selected, keep only completed tasks.
+    else if (selectedFilter.value == 'Completed') {
+      result = result.where((task) => task.isCompleted).toList();
     }
 
-    return tasks;
+    // Get the search text and convert it to lowercase.
+    final query = searchQuery.value.trim().toLowerCase();
+
+    // If the user entered something, search inside task titles.
+    if (query.isNotEmpty) {
+      result = result.where((task) {
+        return task.title.toLowerCase().contains(query);
+      }).toList();
+    }
+
+    // Return the final filtered and searched task list.
+    return result;
   }
 }

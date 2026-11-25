@@ -42,9 +42,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Column(
           children: [
+            // Search box for finding tasks by title.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+              child: TextField(
+                onChanged: (value) {
+                  controller.searchQuery.value = value;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search tasks by title...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+
             // Display All, Pending and Completed buttons.
             Padding(
               padding: const EdgeInsets.all(12),
+
               child: Row(
                 children: ['All', 'Pending', 'Completed'].map((filter) {
                   return Expanded(
